@@ -10,7 +10,16 @@ function createElement(element) {
     }
 
     // Si el elemento es un objeto que representa un componente
-    if (typeof element === 'object' && element.type) {
+    if (typeof element === 'object' && element !== null) {
+        const elementType = element.type;
+        const elementProps = element.props;
+
+        // Si el tipo de elemento es una funcion, es un componente funcional
+        if (typeof elementType === 'function') {
+            // Ejecutamos el componente (funcion)
+            const componenteResult = elementType(elementProps);
+            return createElement(componenteResult);
+        }
         const domElement = document.createElement(element.type);
 
         // Iteramos sobre las propiedades (props) para aplicarlas al elemento del DOM

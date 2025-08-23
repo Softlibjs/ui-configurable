@@ -3,6 +3,7 @@
 **Primeros pasos**
 
 - Renderizando elementos en el DOM
+- Elementos funcionales `Component` que nos permitan interactuar con las `props`
 
 
 ## Elements
@@ -23,6 +24,11 @@ Digamos que queremos mostrar un mensaje **Hola mundo** en un `<div>` que esta en
   - no hay una forma de pasarle propiedades a la etiqueta y el contenido no es dinamico (harcodeado)
   - aunque solo renderizamos texto, un `<div>` puede contener un arbol de lementos
 - Representar elemetos HTML mediante objetos JavaScript
+  - Aunque los objetos nos permiten mejorar la semantica y evitar ciertos problemas
+  - nuestra definicion de elementos no es funcional
+  - no podemos interactuar con los elementos que estamos creando,
+  - una vez creado el elemento no se puede modificar, es inmutable
+  - para poder actualizar el DOM (UI) debemos crear nuevamente el elemento y pasarlo a la función `render()` [Tick Clock Example]()
 
 
 ### Representar elemetos HTML como objetos JavaScript
@@ -46,7 +52,11 @@ const element = {
 > Piensa en ellos como la representación de lo que tu quieres ver en la pantalla.
 
 
-### Components and Props
+## Components and Props
+
+Aunque el enfoque de "objetos de elemento" es un gran paso, no es lo suficientemente flexible para construir interfaces de usuario dinámicas. Los elementos son inmutables. Para lograr interactividad y un mejor manejo del estado, necesitamos un enfoque más funcional.
+
+Para solucionar esto, vamos a crear componentes funcionales. Estos serán funciones que toman `props` (propiedades) y devuelven la descripción de lo que se debe renderizar en el DOM. Esto nos permitirá **encapsular la lógica y reutilizar componentes**.
 
 ### State and Lifecycle
 

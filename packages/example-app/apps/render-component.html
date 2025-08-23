@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Example App</title>
+    <link href="/styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <main>
+        <h1>Render Component - Example App 03</h1>
+        <p class="description">Este es el primer prototipo de la libreria, donde representamos elemetos HTML mediante Componente funcional</p>
+
+        <section class="example" id="root">
+            <!-- aquí se renderiza -->
+        </section>
+    </main>
+
+    <footer>
+        <div>Proyecto Lewis</div>
+        <small id="version">Versión: 0.1.0</small>
+    </footer>
+    <script type="module">
+        import { render } from '@lewis/virtual-dom';
+
+        /**
+         * Componente funcional para un saludo personalizado.
+         * @param {{ name: string }} props Las propiedades del componente.
+         */
+        function Greeting(props) {
+            return {
+                type: 'h1',
+                props: {
+                    children: `¡Hola, ${props.name}!`
+                }
+            };
+        }
+
+        // 1. Encuentra el contenedor del DOM
+        const rootContainer = document.getElementById('root');
+
+        // 2. Crea una funcion que pueda modificar las props y retorne
+        // la representacion HTML mediante un objeto.
+        const appElement = {
+            type: 'div',
+            props: {
+                children: [
+                    {
+                        type: Greeting,
+                        props: { name: 'Juan' }
+                    },
+                    {
+                        type: Greeting,
+                        props: { name: 'Maria' }
+                    }
+                ]
+            }
+        };
+
+        // 3. Llama a la función render para mostrar el objeto
+        render(appElement, rootContainer);
+    </script>
+</body>
+
+</html>

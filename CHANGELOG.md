@@ -7,6 +7,13 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 ---
 
 ## [Unreleased]
+
+## [0.3.0] - 2025-08-22
+### Added
+- Soporte para componentes funcionales: ahora `type` puede ser una función que recibe `props` y devuelve un elemento.
+
+---
+
 ## [0.2.0] - 2025-08-23
 ### Added
 - Prototipo básico de renderizado con objetos JavaScript:
