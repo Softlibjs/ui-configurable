@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Example App</title>
+    <link href="/styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <main>
+        <h1>InnerHtml - Example App 01</h1>
+        <p class="description">Este es el primer prototipo de la libreria, donde representamos elemetos HTML mediante objetos JavaScript</p>
+
+        <section class="example" id="root">
+            <!-- aquí se renderiza con innerHTML -->
+        </section>
+    </main>
+
+    <footer>
+        <div>Proyecto Lewis</div>
+        <small id="version">Versión: 0.1.0</small>
+    </footer>
+    <script type="module">
+        // packages/example-app/index.ts
+        import { render } from '@lewis/virtual-dom';
+
+        // 1. Encuentra el contenedor del DOM
+        const rootContainer = document.getElementById('root');
+
+        // 2. Crea una representacion HTML mediante un objeto
+        const element = {
+            type: 'div',
+            props: {
+                className: 'container',
+                children: [
+                    {
+                        type: 'h1',
+                        props: {
+                            className: 'greeting',
+                            style: {
+                                color: 'red'
+                            },
+                            children: 'Hola, mundo!'
+                        }
+                    },
+                    {
+                        type: 'p',
+                        props: {
+                            children: '¡Esta es mi primera biblioteca reactiva!'
+                        }
+                    }
+                ]
+            }
+        };
+
+        // 3. Llama a la función render para mostrar el objeto
+        render(element, rootContainer);
+    </script>
+</body>
+
+</html>

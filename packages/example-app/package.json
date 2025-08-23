@@ -1,6 +1,6 @@
 {
     "name": "@lewis/example-app",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "private": true,
     "description": "Contenedor de paquetes para el proyecto Lewis.",
     "author": "rmanuel7",
@@ -26,6 +26,6 @@
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "devDependencies": {
-        "@lewis/virtual-dom": "0.1.0"
+        "@lewis/virtual-dom": "0.2.0"
     }
 }

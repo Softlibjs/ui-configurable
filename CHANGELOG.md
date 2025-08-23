@@ -7,6 +7,18 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 ---
 
 ## [Unreleased]
+## [0.2.0] - 2025-08-23
+### Added
+- Prototipo básico de renderizado con objetos JavaScript:
+  - `createDOMElement`: crea nodos del DOM a partir de un objeto declarativo.
+  - `render`: monta el árbol en un contenedor dado.
+- Soporte para:
+  - Nodos de texto y números.
+  - Props como atributos/propiedades.
+  - Eventos `on*` (ej. onClick).
+  - Children recursivos (array o único elemento).
+
+---
 
 ## [0.1.0] - 2025-08-23
 ### Added
