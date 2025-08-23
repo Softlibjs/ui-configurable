@@ -8,6 +8,25 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.1.0] - 2025-08-23
+### Added
+- Prototipo inicial con renderizado mediante `innerHTML`.
+- Se agrego configuracion de *Vite* para mostrar los ejemplos en la ruta `apps/*.html`.
+
+---
+
+## [0.1.0] - 2025-08-22
+### Added
+- Proyecto inicial con configuración básica de Git.
+
+---
+
+### Added
+- Estructura inicial del proyecto.
+- Archivos base: `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`.
+
+---
+
 ### Install and Configure
 - Creacion del repositorio
   ```bash
@@ -26,15 +45,3 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
   npm install -D eslint
   npx eslint --init
   ```
-
-### Added
-- Estructura inicial del proyecto.
-- Archivos base: `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md`.
-
----
-
-## [0.1.0] - 2025-08-22
-### Added
-- Proyecto inicial con configuración básica de Git.
-
-

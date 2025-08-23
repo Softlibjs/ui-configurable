@@ -1,0 +1,30 @@
+{
+    "name": "@lewis/virtual-dom",
+    "version": "0.1.0",
+    "private": true,
+    "description": "Representacion Virtual de elementos DOM para el proyecto Lewis.",
+    "author": "rmanuel7",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/Softlibjs/ui-configurable.git"
+    },
+    "bugs": {
+        "url": "https://github.com/Softlibjs/ui-configurable/issues"
+    },
+    "homepage": "https://github.com/Softlibjs/ui-configurable#readme",
+    "keywords": [
+        "Lewis",
+        "VirtualDOM"
+    ],
+    "type": "module",
+    "main": "index.js",
+    "exports": {
+        ".": {
+            "import": "./index.js",
+            "default": "./index.js"
+        }
+    },
+    "scripts": {},
+    "devDependencies": {}
+}

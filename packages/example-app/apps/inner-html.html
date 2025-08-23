@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Example App</title>
+    <link href="/styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <main>
+        <h1>InnerHtml - Example App 01</h1>
+        <p class="description">Este es el primer prototipo de la libreria, donde solo renderizamos con innerHTML</p>
+
+        <section class="example" id="root">
+            <!-- aquí se renderiza con innerHTML -->
+        </section>
+    </main>
+
+    <footer>
+        <div>Proyecto Lewis</div>
+        <small id="version">Versión: 0.1.0</small>
+    </footer>
+    <script type="module">
+        // packages/example-app/index.ts
+        import { render } from '@lewis/virtual-dom';
+
+        // 1. Encuentra el contenedor del DOM
+        const rootContainer = document.getElementById('root');
+
+        // 2. Llama a la función render para mostrar el mensaje
+        render('<h1>Hola mundo</h1> <p>desde el render con innerHTML</p>', rootContainer);
+    </script>
+</body>
+
+</html>
