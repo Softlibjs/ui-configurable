@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Example App</title>
+    <link href="/styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <main>
+        <h1>Render with State - Example App 04</h1>
+        <p class="description">
+            Este es el primer prototipo de la libreria, donde incluimos un sistema que nos permita observar
+            los cambios en el `estado` y notificar a los componentes que deben actualizarse.
+        </p>
+
+        <section class="example" id="root">
+            <!-- aquí se renderiza -->
+        </section>
+    </main>
+
+    <footer>
+        <div>Proyecto Lewis</div>
+        <small id="version">Versión: 0.4.0</small>
+    </footer>
+    <script type="module">
+        import { render } from '@lewis/virtual-dom';
+        import { useState } from '@lewis/virtual-dom';
+
+        function Clock() {
+            // Usamos el gancho para crear y obtener el estado.
+            const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+
+            // Aquí podemos añadir una suscripción para actualizar el estado automáticamente.
+            // Esto es solo un ejemplo de cómo se integraría en el futuro.
+            setInterval(() => {
+                setCurrentTime(new Date().toLocaleTimeString());
+            }, 1000);
+
+            return {
+                type: 'div',
+                props: {
+                    style: {
+                        fontSize: '24px',
+                        fontWeight: 'bold',
+                    },
+                    children: `La hora actual es: ${currentTime}`
+                }
+            };
+        }
+
+        function Counter() {
+            const [count, setCount] = useState(0);
+
+            // La función que se ejecutará cuando el botón sea clicado.
+            const handleClick = () => {
+                setCount(count + 1);
+            };
+
+            return {
+                type: 'div',
+                props: {
+                    children: [
+                        {
+                            type: 'h1',
+                            props: {
+                                children: `Contador: ${count}`
+                            }
+                        },
+                        {
+                            type: 'button',
+                            props: {
+                                onClick: handleClick,
+                                children: 'Incrementar'
+                            }
+                        }
+                    ]
+                }
+            };
+        }
+
+        // 1. Encuentra el contenedor del DOM
+        const rootContainer = document.getElementById('root');
+
+        // 2. Crea una funcion que pueda modificar las props y retorne
+        // la representacion HTML mediante un objeto.
+        const appElement = {
+            type: 'div',
+            props: {
+                children: [
+                    {
+                        type: 'h1',
+                        children: 'Applicacion con estado'
+                    },
+                    {
+                        type: Clock
+                    },
+                    {
+                        type: Counter
+                    }
+                ]
+            }
+        };
+
+        // 3. Llama a la función render para mostrar el objeto
+        render(appElement, rootContainer);
+    </script>
+</body>
+
+</html>

@@ -8,7 +8,13 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
-## [0.3.0] - 2025-08-22
+## [0.4.0] - 2025-08-24
+### Added
+- Soporte a componentes funcionales con un `hooks` que permite re-renderizar mediante `onUpdate`.
+
+---
+
+## [0.3.0] - 2025-08-23
 ### Added
 - Soporte para componentes funcionales: ahora `type` puede ser una función que recibe `props` y devuelve un elemento.
 

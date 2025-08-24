@@ -1,3 +1,8 @@
+import {
+    setComponentContext,
+    clearComponentContext
+} from './Hooks.js';
+
 /**
  * Crea un elemento del DOM a partir de un objeto que representa el elemento.
  * @param {Object<string, any>} element El objeto que representa el elemento.
@@ -16,45 +21,63 @@ function createElement(element) {
 
         // Si el tipo de elemento es una funcion, es un componente funcional
         if (typeof elementType === 'function') {
-            // Ejecutamos el componente (funcion)
-            const componenteResult = elementType(elementProps);
-            return createElement(componenteResult);
+
+            const observer = {};
+            observer.onUpdate = () => {
+                const parentDOM = observer.prevNode.parentNode;
+                setComponentContext(observer);
+                const componentResult = elementType(elementProps);
+                clearComponentContext(null);
+                const nextNode = createElement(componentResult, parentDOM);
+                parentDOM.replaceChild(nextNode, observer.prevNode);
+                observer.prevNode = nextNode;
+            };
+
+            setComponentContext(observer);
+            const componentResult = elementType(elementProps);
+            clearComponentContext(null);
+
+            const prevNode = createElement(componentResult);
+            observer.prevNode = prevNode;
+            return prevNode;
         }
-        const domElement = document.createElement(element.type);
 
-        // Iteramos sobre las propiedades (props) para aplicarlas al elemento del DOM
-        for (const propName in element.props) {
-            const propValue = element.props[propName];
+        // Si el tipo del elemento es un estring, es un elemento HTML standard
+        if (typeof elementType === 'string') {
+            const domElement = document.createElement(elementType);
 
-            if (propName === 'children') {
-                // Manejamos los hijos del elemento de forma recursiva.
-                // Los hijos pueden ser un solo elemento o un array de elementos.
-                const children = propValue;
-                if (Array.isArray(children)) {
+            // Iteramos sobre las propiedades (props) para aplicarlas al elemento del DOM
+            for (const propName in elementProps) {
+                const propValue = elementProps[propName];
+
+                if (propName === 'children') {
+                    // Manejamos los hijos del elemento de forma recursiva.
+                    // Los hijos pueden ser un solo elemento o un array de elementos.
+                    const children = Array.isArray(propValue) ? propValue : [propValue];
+
                     children.forEach(child => {
                         domElement.appendChild(createElement(child));
                     });
+                } else if (propName.startsWith('on') && typeof propValue === 'function') {
+                    // Manejamos eventos: onClick, onChange, etc.
+                    const eventName = propName.toLowerCase().substring(2);
+                    domElement.addEventListener(eventName, propValue);
+                } else if (propName === 'className') {
+                    // Manejo de la propiedad especial 'className'
+                    domElement.setAttribute('class', propValue);
+                } else if (propName === 'style' && typeof propValue === 'object' && propValue !== null) {
+                    // Manejo del objeto 'style'
+                    for (const styleProp in propValue) {
+                        domElement.style[styleProp] = propValue[styleProp];
+                    }
                 } else {
-                    domElement.appendChild(createElement(children));
+                    // Para otras propiedades, las establecemos como atributos.
+                    domElement[propName] = propValue;
                 }
-            } else if (propName.startsWith('on') && typeof propValue === 'function') {
-                // Manejamos eventos: onClick, onChange, etc.
-                const eventName = propName.toLowerCase().substring(2);
-                domElement.addEventListener(eventName, propValue);
-            } else if (propName === 'className') {
-                // Manejo de la propiedad especial 'className'
-                domElement.setAttribute('class', propValue);
-            } else if (propName === 'style' && typeof propValue === 'object' && propValue !== null) {
-                // Manejo del objeto 'style'
-                for (const styleProp in propValue) {
-                    domElement.style[styleProp] = propValue[styleProp];
-                }
-            } else {
-                // Para otras propiedades, las establecemos como atributos.
-                domElement[propName] = propValue;
             }
+
+            return domElement;
         }
-        return domElement;
     }
 
     // En caso de que el elemento no sea de un tipo válido.

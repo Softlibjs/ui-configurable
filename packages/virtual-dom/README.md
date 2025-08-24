@@ -4,6 +4,7 @@
 
 - Renderizando elementos en el DOM
 - Elementos funcionales `Component` que nos permitan interactuar con las `props`
+- Resolver la inmutabilidad y permitir que el DOM se actualize
 
 
 ## Elements
@@ -29,6 +30,11 @@ Digamos que queremos mostrar un mensaje **Hola mundo** en un `<div>` que esta en
   - no podemos interactuar con los elementos que estamos creando,
   - una vez creado el elemento no se puede modificar, es inmutable
   - para poder actualizar el DOM (UI) debemos crear nuevamente el elemento y pasarlo a la función `render()` [Tick Clock Example]()
+- Representar funciones
+  - Aunque las funciones permiten interactuar con los elementos que estamos creando
+  - aun no podemos actualizar el DOM (UI) sin tener que redibujar toda la UI
+  - tampoco podemos cambiar la UI en respuesta a las acciones del usuario
+  - no tenemos interactividad, no es dinamica
 
 
 ### Representar elemetos HTML como objetos JavaScript
@@ -58,7 +64,29 @@ Aunque el enfoque de "objetos de elemento" es un gran paso, no es lo suficientem
 
 Para solucionar esto, vamos a crear componentes funcionales. Estos serán funciones que toman `props` (propiedades) y devuelven la descripción de lo que se debe renderizar en el DOM. Esto nos permitirá **encapsular la lógica y reutilizar componentes**.
 
-### State and Lifecycle
+```js
+/**
+ * Componente funcional para un saludo personalizado.
+ * @param {{ name: string }} props Las propiedades del componente.
+ */
+function Greeting(props) {
+    return {
+        type: 'h1',
+        props: {
+            children: `¡Hola, ${props.name}!`
+        }
+    };
+}
+```
+
+> [!TIP]
+> Piensa en ello como piezas de codigo reutilizable
+
+## State and Lifecycle
+
+Hasta ahora, nuestra función `render()` es ineficiente porque reemplaza todo el contenido del DOM en cada actualización. Para lograr la interactividad y evitar redibujar la UI por completo, necesitamos un mecanismo para comparar el nuevo estado con el estado anterior y aplicar solo los cambios necesarios. Esto es la esencia del "diffing" o reconciliación.
+
+Para lograr la reactividad, necesitamos un sistema que nos permita observar los cambios en el `estado` y notificar a los componentes que deben actualizarse. En lugar de redibujar todo, solo actualizaremos las partes de la UI que han cambiado.
 
 ### Handling Events
 
