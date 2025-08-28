@@ -25,8 +25,7 @@
         <small id="version">Versión: 0.4.0</small>
     </footer>
     <script type="module">
-        import { render } from '@lewis/virtual-dom';
-        import { useState } from '@lewis/virtual-dom';
+        import { createRoot, createElement, useState, useEffect } from '@lewis/virtual-dom';
 
         function Clock() {
             // Usamos el gancho para crear y obtener el estado.
@@ -34,77 +33,78 @@
 
             // Aquí podemos añadir una suscripción para actualizar el estado automáticamente.
             // Esto es solo un ejemplo de cómo se integraría en el futuro.
-            setInterval(() => {
-                setCurrentTime(new Date().toLocaleTimeString());
-            }, 1000);
+            useEffect(() => {
+                // Este código solo se ejecuta una vez cuando el componente se monta.
+                const timerId = setInterval(() => {
+                    setCurrentTime(new Date().toLocaleTimeString());
+                }, 1000);
 
-            return {
-                type: 'div',
-                props: {
+                // Retornamos una función de limpieza.
+                return () => clearInterval(timerId);
+            });
+
+            return createElement(
+                'div',
+                {
                     style: {
                         fontSize: '24px',
                         fontWeight: 'bold',
                     },
-                    children: `La hora actual es: ${currentTime}`
-                }
-            };
+                },
+                `La hora actual es: ${currentTime}`
+            );
         }
 
         function Counter() {
             const [count, setCount] = useState(0);
+
+            // useEffect para demostrar que se llama después de renderizar
+            useEffect(() => {
+                console.log(`El contador ha sido renderizado. Valor: ${count}`);
+            }, [count]);
 
             // La función que se ejecutará cuando el botón sea clicado.
             const handleClick = () => {
                 setCount(count + 1);
             };
 
-            return {
-                type: 'div',
-                props: {
-                    children: [
+            return createElement(
+                'div',
+                null,
+                [
+                    createElement(
+                        'h1',
+                        null,
+                        `Contador: ${count}`
+                    ),
+                    createElement(
+                        'button',
                         {
-                            type: 'h1',
-                            props: {
-                                children: `Contador: ${count}`
-                            }
+                            onClick: handleClick
                         },
-                        {
-                            type: 'button',
-                            props: {
-                                onClick: handleClick,
-                                children: 'Incrementar'
-                            }
-                        }
-                    ]
-                }
-            };
+                        'Incrementar'
+                    )
+                ]
+            );
         }
 
         // 1. Encuentra el contenedor del DOM
-        const rootContainer = document.getElementById('root');
+        const root = createRoot(document.getElementById('root'));
 
         // 2. Crea una funcion que pueda modificar las props y retorne
         // la representacion HTML mediante un objeto.
-        const appElement = {
-            type: 'div',
-            props: {
-                children: [
-                    {
-                        type: 'h1',
-                        children: 'Applicacion con estado'
-                    },
-                    {
-                        type: Clock
-                    },
-                    {
-                        type: Counter
-                    }
-                ]
-            }
-        };
+        const appElement = createElement(
+            'div',
+            null,
+            [
+                createElement('h1', null, 'Applicacion con estado'),
+                createElement(Clock),
+                createElement(Counter)
+            ]
+        );
 
         // 3. Llama a la función render para mostrar el objeto
-        render(appElement, rootContainer);
+        root.render(appElement);
     </script>
 </body>
 

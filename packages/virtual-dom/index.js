@@ -1,8 +1,10 @@
-export { render } from './src/VirtualDOM.js';
+export {
+    createRoot
+} from './src/VirtualDOM.js';
+export {
+    createElement
+} from './src/VirtualElement.js';
 export {
     useState,
-    useEffect,
-    setComponentContext,
-    clearComponentContext,
-    runCleanupEffects
+    useEffect
 } from './src/Hooks.js';

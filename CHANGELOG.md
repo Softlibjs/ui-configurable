@@ -8,6 +8,13 @@ y este proyecto sigue [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
+## [0.5.0] - 2025-08-28
+### Added
+- Soporte inicial del algoritmo básico de `diffing` para comparar el árbol de elementos virtual viejo con el nuevo.
+- Soporte para `key` en los elementos, fundamental en las listas y en la eficiencia del `diffing`.
+
+---
+
 ## [0.4.0] - 2025-08-24
 ### Added
 - Soporte a componentes funcionales con un `hooks` que permite re-renderizar mediante `onUpdate`.

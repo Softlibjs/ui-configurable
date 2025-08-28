@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba Completa de Renderizado de Virtual DOM</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+
+        .table-container {
+            margin-top: 20px;
+        }
+
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .table-container th,
+        .table-container td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .table-container th {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+        }
+
+        .table-container tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+
+        .table-container input[type="text"] {
+            width: 80px;
+            padding: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .mixed-content {
+            border: 1px dashed #95a5a6;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .mixed-content p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <canvas id="my-canvas" width="400" height="200" style="border:1px solid #000; display: block; margin: 20px auto;"></canvas>
+    <script type="module">
+        // main.js
+        import { createRoot, createElement, useState, useEffect } from '@lewis/virtual-dom';
+
+        /**
+         * Componente para un elemento de la tabla.
+         * Tiene un campo de texto para demostrar la pérdida de estado sin una "key" única.
+         */
+        function TableItem({ user }) {
+            return createElement(
+                'tr',
+                null,
+                createElement('td', null, user.id.toString()),
+                createElement('td', null, user.name),
+                createElement('td', null, createElement('input', { type: 'text', value: '' }))
+            );
+        }
+
+        /**
+         * Un componente de tabla que puede ser ordenado.
+         */
+        function SortableTable({ users }) {
+            const [sortedUsers, setSortedUsers] = useState(users);
+            const [sortOrder, setSortOrder] = useState('asc');
+
+            const handleSort = () => {
+                const newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+                const newUsers = [...sortedUsers].sort((a, b) => {
+                    if (a.name < b.name) return newSortOrder === 'asc' ? -1 : 1;
+                    if (a.name > b.name) return newSortOrder === 'asc' ? 1 : -1;
+                    return 0;
+                });
+
+                setSortedUsers(newUsers);
+                setSortOrder(newSortOrder);
+            };
+
+            return createElement(
+                'div',
+                { className: 'table-container' },
+                createElement('h2', null, 'Tabla de Usuarios'),
+                createElement(
+                    'table',
+                    null,
+                    createElement(
+                        'thead',
+                        null,
+                        createElement(
+                            'tr',
+                            null,
+                            createElement('th', null, 'ID'),
+                            createElement('th', { onClick: handleSort }, `Nombre (${sortOrder})`),
+                            createElement('th', null, 'Campo de Prueba')
+                        )
+                    ),
+                    createElement(
+                        'tbody',
+                        null,
+                        ...sortedUsers.map(user => createElement(TableItem, { user: user }))
+                    )
+                )
+            );
+        }
+
+        /**
+         * Componente principal que demuestra la mezcla de tipos de hijos.
+         */
+        function App() {
+            const initialUsers = [
+                { id: 1, name: 'Charlie' },
+                { id: 2, name: 'Alice' },
+                { id: 3, name: 'Bob' }
+            ];
+
+            const [isVisible, setIsVisible] = useState(true);
+
+            const toggleVisibility = () => {
+                setIsVisible(!isVisible);
+            };
+
+            return createElement(
+                'div',
+                { className: 'container' },
+                createElement('h1', null, 'Prueba de Reconciliación Completa'),
+
+                // Uso del componente de tabla
+                createElement(SortableTable, { users: initialUsers }),
+
+                // Uso de un booleano para mostrar/ocultar un div
+                isVisible && createElement(
+                    'div',
+                    { style: { marginTop: '20px', padding: '15px', border: '1px solid #27ae60' } },
+                    'Este div se muestra y se oculta con un booleano.'
+                ),
+
+                createElement('button',
+                    {
+                        onClick: toggleVisibility,
+                        style: { marginTop: '10px', padding: '10px', cursor: 'pointer' }
+                    },
+                    isVisible ? 'Ocultar' : 'Mostrar'
+                ),
+
+                // Mezcla de diferentes tipos de hijos para el mismo elemento
+                createElement(
+                    'div',
+                    { className: 'mixed-content' },
+                    createElement('h2', null, 'Hijos de Tipos Mixtos'),
+                    'Este es un texto (string) en el mismo nivel.',
+                    createElement('p', null, 'Este es un párrafo (etiqueta HTML).'),
+                    null, // Un valor nulo que debe ser ignorado
+                    'El valor booleano "false" a continuación es ignorado: ',
+                    false, // Un valor booleano que debe ser ignorado
+                    'Este es un número (0): ',
+                    0, // Un número que se renderiza como texto
+                    createElement('p', null, `La visibilidad es: ${isVisible ? 'visible' : 'oculta'}`),
+                    createElement('h4', null, 'Fin del contenido mixto.')
+                ),
+
+                // Sección del canvas (solo para probar que se puede renderizar)
+                createElement(
+                    'p',
+                    { style: { textAlign: 'center', marginTop: '20px' } },
+                    'El elemento canvas ha sido renderizado en el DOM.'
+                )
+            );
+        }
+
+        const root = createRoot(
+            document.getElementById('root')
+        );
+        root.render(
+            createElement(App, null)
+        );
+    </script>
+</body>
+
+</html>

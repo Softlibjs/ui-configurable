@@ -1,105 +1,64 @@
 import {
-    setComponentContext,
-    clearComponentContext
-} from './Hooks.js';
+    CONTAINER_NO_SUPPORTED
+} from './Constants.js';
+
+import {
+    isRenderObject
+} from './Utils.js';
+
+import {
+    mount
+} from './MountElement.js';
 
 /**
- * Crea un elemento del DOM a partir de un objeto que representa el elemento.
- * @param {Object<string, any>} element El objeto que representa el elemento.
- * @returns {Node} El nodo del DOM creado.
+ * Crea un objeto root para gestionar la renderización en un contenedor del DOM.
+ * @param {HTMLElement} container El nodo del DOM donde se montará la aplicación.
+ * @returns {{render: function, unmount: function}} Un objeto con métodos para gestionar el root.
  */
-function createElement(element) {
-    // Si el elemento es un string o un número, creamos un nodo de texto.
-    if (typeof element === 'string' || typeof element === 'number') {
-        return document.createTextNode(element.toString());
+function createRoot(container) {
+    // 1. Validamos que el contenedor sea un Nodo que pueda albergar hijos.
+    if (
+        container.nodeType !== Node.ELEMENT_NODE &&
+        container.nodeType !== Node.DOCUMENT_NODE &&
+        container.nodeType !== Node.DOCUMENT_FRAGMENT_NODE
+    ) {
+        throw new TypeError(CONTAINER_NO_SUPPORTED);
     }
 
-    // Si el elemento es un objeto que representa un componente
-    if (typeof element === 'object' && element !== null) {
-        const elementType = element.type;
-        const elementProps = element.props;
+    if (container === document) {
+        container = document.documentElement;
+    }
 
-        // Si el tipo de elemento es una funcion, es un componente funcional
-        if (typeof elementType === 'function') {
+    /** @type {Function|{ render: Function, unmount: Function, type: string|Function, key: string|null, ref: { current }, props: Object<string, any> }|string|number|null|undefined} */
+    var currentElement = null;
 
-            const observer = {};
-            observer.onUpdate = () => {
-                const parentDOM = observer.prevNode.parentNode;
-                setComponentContext(observer);
-                const componentResult = elementType(elementProps);
-                clearComponentContext(null);
-                const nextNode = createElement(componentResult, parentDOM);
-                parentDOM.replaceChild(nextNode, observer.prevNode);
-                observer.prevNode = nextNode;
-            };
+    return {
+        /**
+         * Renderiza un elemento en el contenedor del root.
+         * @param {Function|currentElement|string|number|null|undefined} element El elemento a renderizar.
+         */
+        render(element) {
 
-            setComponentContext(observer);
-            const componentResult = elementType(elementProps);
-            clearComponentContext(null);
+            // Montar
+            mount(element, container, domNode => {
+                container.appendChild(domNode);
+            });
+            currentElement = element;
+        },
 
-            const prevNode = createElement(componentResult);
-            observer.prevNode = prevNode;
-            return prevNode;
-        }
-
-        // Si el tipo del elemento es un estring, es un elemento HTML standard
-        if (typeof elementType === 'string') {
-            const domElement = document.createElement(elementType);
-
-            // Iteramos sobre las propiedades (props) para aplicarlas al elemento del DOM
-            for (const propName in elementProps) {
-                const propValue = elementProps[propName];
-
-                if (propName === 'children') {
-                    // Manejamos los hijos del elemento de forma recursiva.
-                    // Los hijos pueden ser un solo elemento o un array de elementos.
-                    const children = Array.isArray(propValue) ? propValue : [propValue];
-
-                    children.forEach(child => {
-                        domElement.appendChild(createElement(child));
-                    });
-                } else if (propName.startsWith('on') && typeof propValue === 'function') {
-                    // Manejamos eventos: onClick, onChange, etc.
-                    const eventName = propName.toLowerCase().substring(2);
-                    domElement.addEventListener(eventName, propValue);
-                } else if (propName === 'className') {
-                    // Manejo de la propiedad especial 'className'
-                    domElement.setAttribute('class', propValue);
-                } else if (propName === 'style' && typeof propValue === 'object' && propValue !== null) {
-                    // Manejo del objeto 'style'
-                    for (const styleProp in propValue) {
-                        domElement.style[styleProp] = propValue[styleProp];
-                    }
-                } else {
-                    // Para otras propiedades, las establecemos como atributos.
-                    domElement[propName] = propValue;
-                }
+        /**
+         * Desmonta el árbol de componentes del root y limpia los recursos.
+         */
+        unmount() {
+            if (isRenderObject(currentElement)) {
+                currentElement.unmount();
             }
-
-            return domElement;
+            container.innerHTML = '';
         }
-    }
-
-    // En caso de que el elemento no sea de un tipo válido.
-    return document.createComment("Elemento no válido");
+    };
 }
 
 
-/**
- * Renderiza un elemento de nuestra biblioteca en un contenedor del DOM.
- * @param element El elemento a renderizar. Podría ser un objeto, string, o función.
- * @param {HTMLElement} container El nodo del DOM (por ejemplo, un <div>) donde se renderizará el elemento.
- */
-function render(element, container) {
-    if (!container) {
-        throw new Error('El contenedor del DOM no fue encontrado.');
-    }
-
-    // Limpiamos el contenido anterior para renderizar el nuevo.
-    container.innerHTML = '';
-
-    const domElement = createElement(element);
-    container.appendChild(domElement);
-}
-
-export { render };
+export {
+    createRoot
+};

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es-CO">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Example App</title>
+    <link href="/styles.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <main>
+        <h1>Render with State - Example App 04</h1>
+        <p class="description">
+            Este es el primer prototipo de la libreria, donde incluimos un sistema que nos permita observar
+            los cambios en el `estado` y notificar a los componentes que deben actualizarse.
+        </p>
+
+        <section class="example" id="root">
+            <!-- aquí se renderiza -->
+        </section>
+    </main>
+
+    <footer>
+        <div>Proyecto Lewis</div>
+        <small id="version">Versión: 0.4.0</small>
+    </footer>
+    <script type="module">
+        import { createRoot, createElement, useState, useEffect } from '@lewis/virtual-dom';
+
+        function ListItem({ name }) {
+            return createElement(
+                'div',
+                null,
+                [
+                    createElement('p', null, name),
+                    createElement('input', { type: 'text', placeholder: 'Escribe algo...' }),
+                ]
+            );
+        }
+
+        function List() {
+            const initialList = ['Alice', 'Bob', 'Charlie'];
+            const [list, setList] = useState(initialList);
+
+            const reverseList = () => {
+                setList(list.slice().reverse());
+            };
+
+            return createElement(
+                'div',
+                null,
+                [
+                    createElement(
+                        'button',
+                        {
+                            onClick: reverseList
+                        },
+                        'Invertir Lista'
+                    ),
+                    ...list.map(
+                        name => createElement(
+                            ListItem,
+                            { name: name }
+                        )
+                    ),
+                ]
+            );
+        }
+
+        // 1. Encuentra el contenedor del DOM
+        const root = createRoot(document.getElementById('root'));
+
+        // 2. Crea una funcion que pueda modificar las props y retorne
+        // la representacion HTML mediante un objeto.
+        const appElement = createElement(
+            'div',
+            null,
+            [
+                createElement('h1', null, 'Applicacion con estado'),
+                createElement(List),
+            ]
+        );
+
+        // 3. Llama a la función render para mostrar el objeto
+        root.render(appElement);
+    </script>
+</body>
+
+</html>

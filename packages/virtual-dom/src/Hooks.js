@@ -74,6 +74,7 @@ function useEffect(effect, dependencies) {
     var effectsData = componentStateMap.get(component).effects;
     var myHookIndex = hookIndex++;
     // Si no hay dependencias, ejecutar siempre
+    dependencies ??= [];
     var hasNoDependencies = !dependencies || dependencies.length === 0;
     // Si no hay efecto anterior, jecutar
     if (effectsData[myHookIndex] === undefined) {

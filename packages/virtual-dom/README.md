@@ -2,94 +2,72 @@
 
 **Primeros pasos**
 
-- Renderizando elementos en el DOM
-- Elementos funcionales `Component` que nos permitan interactuar con las `props`
-- Resolver la inmutabilidad y permitir que el DOM se actualize
+* Renderizando elementos en el DOM
+* Elementos funcionales `Component` que nos permitan interactuar con las `props`
+* Resolver la inmutabilidad y permitir que el DOM se actualice
 
+---
 
-## Elements
+### Versiones
 
-### Renderizando elementos en el DOM
+#### [0.1.0] - Renderizado con `innerHTML`
+En la primera versión, la forma más simple de mostrar contenido en la página era utilizando `innerHTML`.
 
-Digamos que queremos mostrar un mensaje **Hola mundo** en un `<div>` que esta en alguna parte de tu pagina HTML.
+**Fortalezas:**
+* Sencillo y directo.
 
-```html
-<div id="root"></div>
-```
+**Problemas:**
+* **Inseguridad:** Es vulnerable a ataques de inyección de código (XSS).
+* **Inmutabilidad:** El contenido es estático y no puede ser actualizado dinámicamente.
+* **Falta de semántica:** No podemos pasar propiedades o manejar eventos de manera organizada.
 
-**Opciones posibles**
+---
 
-- Seleccionar el contenedor `<div>` y utilizar la propiedad `innerHTML`, pero esto nos deja con varios problemas:
-  - `innerHTML` es peligroso porque puede incluir codigo no desado (Injection Attacks as XSS cross-site-scripting)
-  - no existe una reutilizacion de la etiqueta `<div>`
-  - no hay una forma de pasarle propiedades a la etiqueta y el contenido no es dinamico (harcodeado)
-  - aunque solo renderizamos texto, un `<div>` puede contener un arbol de lementos
-- Representar elemetos HTML mediante objetos JavaScript
-  - Aunque los objetos nos permiten mejorar la semantica y evitar ciertos problemas
-  - nuestra definicion de elementos no es funcional
-  - no podemos interactuar con los elementos que estamos creando,
-  - una vez creado el elemento no se puede modificar, es inmutable
-  - para poder actualizar el DOM (UI) debemos crear nuevamente el elemento y pasarlo a la función `render()` [Tick Clock Example]()
-- Representar funciones
-  - Aunque las funciones permiten interactuar con los elementos que estamos creando
-  - aun no podemos actualizar el DOM (UI) sin tener que redibujar toda la UI
-  - tampoco podemos cambiar la UI en respuesta a las acciones del usuario
-  - no tenemos interactividad, no es dinamica
+#### [0.2.0] - Representación con objetos
+Para mejorar la estructura, representamos los elementos HTML como objetos JavaScript.
 
+**Fortalezas:**
+* Mejora la semántica y la organización del código.
+* Nos permite definir un árbol de elementos anidado.
 
-### Representar elemetos HTML como objetos JavaScript
+**Problemas:**
+* **Aún inmutable:** Una vez creado, el objeto no puede ser modificado. Para cualquier cambio, hay que redibujar todo el árbol.
 
-Esto nos permite tener una representación de la interfaz de usuario en memoria (algo similar a un "Virtual DOM"), lo que facilita el manejo de cambios y actualizaciones de manera eficiente.
+---
 
-```js
-// Note: en luagar de tener un texto con la etiqueta <h1>Hola mundo</h1>
-//       temos un objeto al cual podemos manipular para que represente
-//       nuestro HTML
-const element = {
-  type: 'h1',
-  props: {
-    className: 'greeting',
-    children: 'Hello, world!'
-  }
-};
-```
+#### [0.3.0] - Introducción de Componentes
+Se introduce la capacidad de manejar componentes funcionales. Ahora, `createElement` puede aceptar tanto una cadena (como `'div'`) como una función, lo que nos permite crear componentes reutilizables. Esto resuelve el problema de la falta de un patrón funcional para crear elementos.
 
-> [!TIP]
-> Piensa en ellos como la representación de lo que tu quieres ver en la pantalla.
+**Fortalezas:**
+* **Modularidad:** Permite crear componentes funcionales reutilizables.
+* **Flujo de renderizado recursivo:** Se crea un árbol en memoria que representa los componentes y elementos.
 
+**Problemas:**
+* **Inmutabilidad persistente:** A pesar de tener componentes, no existe un mecanismo para actualizar el estado internamente. Para cualquier cambio, el componente debe ser montado de nuevo.
 
-## Components and Props
+---
 
-Aunque el enfoque de "objetos de elemento" es un gran paso, no es lo suficientemente flexible para construir interfaces de usuario dinámicas. Los elementos son inmutables. Para lograr interactividad y un mejor manejo del estado, necesitamos un enfoque más funcional.
+#### [0.4.0] - Estado y Ciclo de Vida (Hooks)
+Se añaden `useState` y `useEffect`, una arquitectura de ganchos (hooks) que permite a los componentes tener su propio estado interno y manejar efectos secundarios (como temporizadores y llamadas a APIs).
 
-Para solucionar esto, vamos a crear componentes funcionales. Estos serán funciones que toman `props` (propiedades) y devuelven la descripción de lo que se debe renderizar en el DOM. Esto nos permitirá **encapsular la lógica y reutilizar componentes**.
+**Fortalezas:**
+* **Reactividad:** Los componentes ahora pueden actualizarse en respuesta a cambios de estado.
+* **Efectos secundarios:** Permite gestionar tareas como la limpieza de recursos.
+* **Fugas de memoria:** La función de limpieza de `useEffect` evita que los temporizadores y otros efectos sigan ejecutándose después de que el componente es eliminado.
 
-```js
-/**
- * Componente funcional para un saludo personalizado.
- * @param {{ name: string }} props Las propiedades del componente.
- */
-function Greeting(props) {
-    return {
-        type: 'h1',
-        props: {
-            children: `¡Hola, ${props.name}!`
-        }
-    };
-}
-```
+**Problemas:**
+* **Contexto global:** La implementación actual de los hooks depende de variables globales (`currentComponent` y `hookIndex`), lo que puede causar errores en entornos asincrónicos, mezclando los estados de diferentes componentes si no se maneja cuidadosamente.
 
-> [!TIP]
-> Piensa en ello como piezas de codigo reutilizable
+---
 
-## State and Lifecycle
+#### [0.5.0] - Reconciliación, `Keys` y Tipos de Hijos
+Se implementa un algoritmo inicial de reconciliación (`diffing`) para comparar el estado anterior y el nuevo, y se introducen las `keys` para identificar los elementos en una lista. También se mejora la función de renderizado para manejar múltiples tipos de hijos.
 
-Hasta ahora, nuestra función `render()` es ineficiente porque reemplaza todo el contenido del DOM en cada actualización. Para lograr la interactividad y evitar redibujar la UI por completo, necesitamos un mecanismo para comparar el nuevo estado con el estado anterior y aplicar solo los cambios necesarios. Esto es la esencia del "diffing" o reconciliación.
+**Fortalezas:**
+* **Reconciliación:** La aplicación ahora solo actualiza los nodos del DOM que han cambiado, en lugar de borrar y recrear todo el árbol.
+* **Compatibilidad:** Maneja correctamente una mezcla de diferentes tipos de hijos (`string`, `number`, `boolean`, `null`, `componente`, `etiqueta`).
+* **Manejo de `keys`:** El algoritmo ahora reconoce la propiedad `key` en los elementos.
 
-Para lograr la reactividad, necesitamos un sistema que nos permita observar los cambios en el `estado` y notificar a los componentes que deben actualizarse. En lugar de redibujar todo, solo actualizaremos las partes de la UI que han cambiado.
+**Problemas:**
+* **Reordenamiento de `keys`:** El algoritmo de reconciliación no está optimizado para reordenar los nodos. Cuando se ordena una lista, los elementos del DOM no cambian de posición, lo que puede causar que el estado (por ejemplo, el texto en un `input`) se mezcle entre diferentes filas.
 
-### Handling Events
-
-### Lists and Keys
-
-### Forms

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demostración de Desmontaje de Componentes</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f2f5;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .clock-container {
+            border: 2px solid #3498db;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #e74c3c;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="module">
+        // main.js
+        import { createRoot, createElement, useState, useEffect } from '@lewis/virtual-dom';
+
+        /**
+         * Componente de Reloj que usa useEffect con una función de limpieza.
+         */
+        function Clock() {
+            // Usamos el gancho para crear y obtener el estado.
+            const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString());
+
+            // Se ejecuta cada segundo para actualizar el reloj.
+            // La función de retorno limpiará el temporizador.
+            useEffect(() => {
+                console.log('Clock: El componente se ha montado y el temporizador ha iniciado.');
+                const timerId = setInterval(() => {
+                    setCurrentTime(new Date().toLocaleTimeString());
+                }, 1000);
+
+                // Esta es la función de limpieza que se ejecutará cuando el componente se desmonte.
+                return () => {
+                    clearInterval(timerId);
+                    console.log('Clock: El componente se ha desmontado y el temporizador se ha detenido.');
+                };
+            }, []);
+
+            return createElement(
+                'div',
+                { className: 'clock-container' },
+                `La hora actual es: ${currentTime}`
+            );
+        }
+
+        /**
+         * Componente principal que alterna la visibilidad de `Clock`.
+         */
+        function App() {
+            const [showClock, setShowClock] = useState(true);
+
+            const toggleClock = () => {
+                setShowClock(!showClock);
+            };
+
+            return createElement(
+                'div',
+                { className: 'container' },
+                createElement('h1', null, 'Prueba de Desmontaje'),
+                createElement('button',
+                    {
+                        onClick: toggleClock
+                    },
+                    showClock ? 'Ocultar Reloj' : 'Mostrar Reloj'
+                ),
+                // Solo renderizamos el componente si `showClock` es verdadero
+                showClock && createElement(Clock)
+            );
+        }
+
+        const root = createRoot(
+            document.getElementById('root')
+        );
+
+        root.render(
+            createElement(App, null)
+        );
+    </script>
+</body>
+
+</html>
