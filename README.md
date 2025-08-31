@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Lewis
 
 Biblioteca Reactiva con Inyección de Dependencias
@@ -49,7 +48,4 @@ El monorepo está organizado en la carpeta `packages/`. Cada subdirectorio dentr
 ## Contribuciones
 
 ¡Las contribuciones son bienvenidas! Si deseas contribuir, por favor, lee nuestras guías de contribución y el código de conducta.
-=======
-# ui-configurable
-Proyecto enfocado en el desarrollo de una UI dinamica y configurable.
->>>>>>> b405a986949676ec24ed67fd27c62fbc1ab906ee
+
